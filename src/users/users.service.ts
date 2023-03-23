@@ -116,4 +116,80 @@ export class UsersService {
       throw error;
     }
   }
+
+  // method to update the details of the user
+  async updateUserDetails(userId: string, userData: any) {
+    try {
+      const user = await this.databaseService.user.findUnique({
+        where: {
+          id: parseInt(userId),
+        },
+      });
+
+      if (!user) {
+        throw new ForbiddenException(`No User found with id ${userId}`);
+      }
+
+      const result = await this.databaseService.user.update({
+        where: {
+          id: parseInt(userId),
+        },
+        data: {
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return {
+        message: 'Details of user updated successfully',
+        data: result,
+      };
+    } catch (error) {
+      console.log('Error while updating user data in db: ');
+      console.log(error);
+      throw error;
+    }
+  }
+
+  // method below is used to delete user by id
+  async deleteUserById(id: string) {
+    try {
+      const user = await this.databaseService.user.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+
+      if (!user) {
+        throw new ForbiddenException(`No User found with id ${id}`);
+      }
+
+      const result = await this.databaseService.user.delete({
+        where: {
+          id: parseInt(id),
+        },
+      });
+
+      if (!result) {
+        throw new ForbiddenException('Unable to delete the user');
+      }
+
+      return {
+        message: 'User Deleted successfully',
+      };
+    } catch (error) {
+      console.log('Error while delete user data in db: ');
+      console.log(error);
+      throw error;
+    }
+  }
 }
